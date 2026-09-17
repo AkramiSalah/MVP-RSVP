@@ -45,23 +45,16 @@ async function sendTestMessage() {
 
   const url = `https://graph.facebook.com/v25.0/${phoneNumberId}/messages`;
 
+  // Exact payload structure from your curl command
   const payload = {
     messaging_product: "whatsapp",
     to: "972543599832",
     type: "template",
     template: {
-      name: "jaspers_market_order_confirmation_v1",
-      language: { code: "en_US" },
-      components: [
-        {
-          type: "body",
-          parameters: [
-            { type: "text", text: "John Doe" },
-            { type: "text", text: "123456" },
-            { type: "text", text: "Sep 17, 2026" }
-          ]
-        }
-      ]
+      name: "hello_world",
+      language: { 
+        code: "en_US" 
+      }
     }
   };
 
