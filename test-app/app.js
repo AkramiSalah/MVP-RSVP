@@ -35,3 +35,48 @@ app.post('/', (req, res) => {
 app.listen(port, () => {
   console.log(`\nListening on port ${port}\n`);
 });
+
+
+const axios = require('axios');
+
+async function sendTestMessage() {
+  const token = process.env.WHATSAPP_TOKEN;
+  const phoneNumberId = process.env.PHONE_ID;
+
+  const url = `https://graph.facebook.com/v25.0/${phoneNumberId}/messages`;
+
+  const payload = {
+    messaging_product: "whatsapp",
+    to: "972543599832",
+    type: "template",
+    template: {
+      name: "jaspers_market_order_confirmation_v1",
+      language: { code: "en_US" },
+      components: [
+        {
+          type: "body",
+          parameters: [
+            { type: "text", text: "John Doe" },
+            { type: "text", text: "123456" },
+            { type: "text", text: "Sep 17, 2026" }
+          ]
+        }
+      ]
+    }
+  };
+
+  try {
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Success!', response.data);
+  } catch (error) {
+    console.error('Failed:', error.response?.data || error.message);
+  }
+}
+
+// Call it to test
+sendTestMessage();
