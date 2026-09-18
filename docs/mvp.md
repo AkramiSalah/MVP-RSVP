@@ -9,7 +9,7 @@
 * show response on the user's end.
 
 
-# Open for Decisiton:
+# Open for Decision:
 
 ## Organizer Ergonomics: how does the organizer see the status?:
 - Option A: Minimal web page (SPA with a read only status table)
