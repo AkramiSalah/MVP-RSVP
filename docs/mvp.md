@@ -33,3 +33,32 @@ Option C was never really on the table, since it isn't ToS compliant
 and exposes me to risks like account bans and potential legal issues.
 
 
+# System Flow
+
+
+
+```mermaid
+    sequenceDiagram
+    title The Core of the RSVP loop
+    participant O as Organizer
+    participant A as App
+    participant DB as Database
+    participant M as Meta WhatsApp API
+    participant I as Invitee
+
+    O->>A: Upload spreadsheet (name, phone)
+    A->>DB: Create Event + Invitee records (status: pending)
+    A->>M: Send RSVP template (Yes/No/Unsure)
+    M->>I: Deliver WhatsApp message
+    A->>DB: Update status: sent
+
+    I->>M: Press button (Yes/No/Unsure)
+    M->>A: Webhook: button reply
+    A->>DB: Update status: confirmed/declined/unsure
+
+    O->>A: Request status update
+    A->>DB: Read all invitee statuses
+    A->>M: Send summary message
+    M->>O: Deliver status summary
+```
+
