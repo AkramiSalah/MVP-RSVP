@@ -21,3 +21,22 @@ messages without needing to submit for approval or pay upfront.
 Option C was never really on the table, since it isn't ToS compliant 
 and exposes me to risks like account bans and potential legal issues.
 
+## Tech Stack: what do we build the backend in?
+**Decided: Python, FastAPI, SQLite.**
+Considered C/C++ (strongest personal skillset) but ruled it out — no 
+mature web framework ecosystem, and this app's workload (webhook 
+receive, DB write, outbound HTTP call) is I/O-bound, not compute-bound, 
+so C/C++'s performance advantage doesn't apply here. Chose FastAPI for 
+fastest path to a working skeleton with minimal boilerplate; SQLite for 
+zero-setup MVP storage, swappable for Postgres later if needed.
+
+
+## System Architecture: monolith vs. microservices
+**Decided: Monolith, no microservices.**
+Considered splitting out C/C++ microservices for performance-critical 
+paths. Ruled out for v1 — microservices solve scaling/organizational 
+problems (independent deployability, team boundaries) that don't exist 
+yet for a solo-built MVP, and would add infrastructure overhead with no 
+corresponding benefit at this stage. Revisit only if profiling reveals 
+an actual compute-bound bottleneck at real scale.
+
