@@ -1,17 +1,16 @@
-// Import Express.js
+
 const express = require('express');
+const axios = require('axios');
 
-// Create an Express app
 const app = express();
-
-// Middleware to parse JSON bodies
 app.use(express.json());
 
-// Set port and verify_token
 const port = process.env.PORT || 3000;
 const verifyToken = process.env.VERIFY_TOKEN;
+const whatsappToken = process.env.WHATSAPP_TOKEN;
 
-// Route for GET requests
+
+// Webhook Verification (GET)
 app.get('/', (req, res) => {
   const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
 
@@ -23,53 +22,83 @@ app.get('/', (req, res) => {
   }
 });
 
-// Route for POST requests
-app.post('/', (req, res) => {
-  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-  console.log(`\n\nWebhook received ${timestamp}\n`);
-  console.log(JSON.stringify(req.body, null, 2));
+// Incoming Events (POST)
+app.post('/', async (req, res) => {
+  // Always respond 200 fast so Meta doesn't retry
   res.status(200).end();
+
+  const entry = req.body.entry?.[0]?.changes?.[0]?.value;
+  const message = entry?.messages?.[0];
+
+  if (message) {
+    const senderId = entry.metadata.phone_number_id;
+    const from = message.from;
+
+    console.log(`Received message from ${from}:`, message.text?.body || message.type);
+
+    // Example: Auto-reply with an interactive button message
+    try {
+      await messageWithInteractiveReply(
+        senderId,
+        from,
+        "Thanks for reaching out! How can we help?",
+        "btn_support",
+        "Talk to Support"
+      );
+    } catch (err) {
+      console.error('Failed to reply:', err.response?.data || err.message);
+    }
+  }
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`\nListening on port ${port}\n`);
-});
+// WhatsApp API Caller using axios
+async function makeApiCall(senderPhoneNumberId, requestBody) {
+  const url = `https://graph.facebook.com/v21.0/${senderPhoneNumberId}/messages`;
 
+  const response = await axios.post(url, requestBody, {
+    headers: {
+      'Authorization': `Bearer ${whatsappToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
 
-const axios = require('axios');
+  return response.data;
+}
 
-async function sendTestMessage() {
-  const token = process.env.WHATSAPP_TOKEN;
-  const phoneNumberId = process.env.PHONE_ID;
-
-  const url = `https://graph.facebook.com/v25.0/${phoneNumberId}/messages`;
-
-  // Exact payload structure from your curl command
-  const payload = {
+// Send Interactive Button Message (Max 3 buttons allowed by WhatsApp)
+async function messageWithInteractiveReply(
+  senderPhoneNumberId,
+  recipientPhoneNumber,
+  messageText,
+  buttonId = "btn_1",
+  buttonLabel = "Reply"
+) {
+  const requestBody = {
     messaging_product: "whatsapp",
-    to: "972543599832",
-    type: "template",
-    template: {
-      name: "hello_world",
-      language: { 
-        code: "en_US" 
+    to: recipientPhoneNumber,
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: {
+        text: messageText
+      },
+      action: {
+        buttons: [
+          {
+            type: "reply",
+            reply: {
+              id: buttonId,
+              title: buttonLabel.slice(0, 20) // Meta 20-character limit
+            }
+          }
+        ]
       }
     }
   };
 
-  try {
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    console.log('Success!', response.data);
-  } catch (error) {
-    console.error('Failed:', error.response?.data || error.message);
-  }
+  return makeApiCall(senderPhoneNumberId, requestBody);
 }
 
-// Call it to test
-sendTestMessage();
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
