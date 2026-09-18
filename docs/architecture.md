@@ -23,26 +23,26 @@ included from v1 even though the MVP only needs a single event at a
 time, since the underlying business model (per-event pricing, repeat 
 organizers) implies this relationship will matter quickly.
 
-No `Organizers`/auth table for MVP — single-operator assumption for v1.
+NOTE: No Organizers/auth table for MVP — single-operator assumption for v1.
 
-​```mermaid
-erDiagram
-    EVENTS ||--o{ INVITEES : has
-    EVENTS {
-        int id
-        string name
-        datetime created_at
-    }
-    INVITEES {
-        int id
-        int event_id
-        string name
-        string phone_number
-        string status
-        datetime created_at
-        datetime updated_at
-    }
-​```
+```mermaid
+    erDiagram
+        EVENTS ||--o{ INVITEES : has
+        EVENTS {
+            int id
+            string name
+            datetime created_at
+        }
+        INVITEES {
+            int id
+            int event_id
+            string name
+            string phone_number
+            string status
+            datetime created_at
+            datetime updated_at
+        }
+```
 
 
 # System Flow
@@ -72,5 +72,19 @@ erDiagram
     A->>M: Send summary message
     M->>O: Deliver status summary
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
