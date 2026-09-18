@@ -99,6 +99,24 @@ async function messageWithInteractiveReply(
   return makeApiCall(senderPhoneNumberId, requestBody);
 }
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server listening on port ${port}`);
+
+  // Test sending an interactive button message on server boot
+  const recipient = "972543599832"; // Must be international format without '+' or leading zeros
+  const senderId = process.env.PHONE_ID;
+
+  try {
+    console.log(`Attempting to send test interactive message to ${recipient}...`);
+    const result = await messageWithInteractiveReply(
+      senderId,
+      recipient,
+      "This is a test interactive message! Click below:",
+      "btn_test_1",
+      "Confirm Action"
+    );
+    console.log("Message sent successfully:", result);
+  } catch (err) {
+    console.error("Failed to send message:", JSON.stringify(err.response?.data || err.message, null, 2));
+  }
 });
