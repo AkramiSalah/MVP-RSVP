@@ -1,0 +1,16 @@
+CREATE TABLE Events(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Invitees(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL,
+    phone_number TEXT NOT NULL,
+    name TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES Events(id)
+);
