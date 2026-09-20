@@ -28,7 +28,8 @@ async def verify_webhook(
     raise HTTPException(status_code=403, detail='Verification failed')
 
 @app.post("/webhook")
-async def handle_webhook(payload):
+async def handle_webhook(request: Request):
+    print("payload", request)
     return{'status': 'success'}
 
 
