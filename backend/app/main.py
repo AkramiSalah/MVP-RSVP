@@ -12,8 +12,12 @@ async def root():
     return {"message": "testing testing testing, hello world"}
 
 @app.get("/webhook")
-async def webhook_challenge(mode: str, token: str, challenge: str):
-    if mode == 'subscribe' and token == verify_token:
+async def verify_webhook(
+    mode: str = Query(None, alias="hub.mode"),
+    challenge: str = Query(None, alias="hub.challenge"),
+    verify_token: str = Query(None, alias="hub.verify_token")
+):
+    if mode == 'subscribe' and verify_token == VERIFY_TOKEN:
         print('Webhook has been verified successfuly')
         return int(challenge)
     
