@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException, Query
 from dotenv import load_dotenv
+import json
+import sys
 import os
 
 load_dotenv()
@@ -29,7 +31,21 @@ async def verify_webhook(
 
 @app.post("/webhook")
 async def handle_webhook(request: Request):
-    print("payload", request)
+    data = await request.json()
+    if data:
+        for entry in data.get('entry', []):
+            for change in entry.get('changes', []):
+                messages = change.get('value', {}).get('messages',[])
+                for message in messages:
+                    phone_number = message.get('from', None)
+                    timestamp    = message.get('timestamp', None)
+                    text = message.get('text', {}).get('body', None)
+
+                    print("phone_number: ",phone_number)
+                    print("timestamp: ",  timestamp)
+                    print("text: ",  text)
+
+
     return{'status': 'success'}
 
 
