@@ -2,9 +2,10 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
 app = FastAPI()
 
-verify_token = os.getenv('VERIFY_TOKEN')
+VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
 @app.get("/")
 async def root():
