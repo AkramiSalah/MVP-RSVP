@@ -22,6 +22,9 @@ async def verify_webhook(
         return int(challenge)
     
     print('Webhook verification failed!')
+    print("mode :", mode)
+    print("challenge :", challenge)
+    print("verify_token :", verify_token, VERIFY_TOKEN)
     raise HTTPException(status_code=403, detail='Verification failed')
 
 @app.post("/webhook")
