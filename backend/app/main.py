@@ -11,7 +11,7 @@ VERIFY_TOKEN = os.getenv('VERIFY_TOKEN')
 
 @app.get("/")
 async def root():
-    return {"message": "testing testing testing, hello world"}
+    return {"message": "endpoint is up!"}
 
 @app.get("/webhook")
 async def verify_webhook(
